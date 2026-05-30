@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo "Login to Docker"
+      - docker --version
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_NAME=my-python-app
+  build:
+    commands:
+      - echo "Build Docker image"
+      - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+      - docker save -o $IMAGE_NAME.tar $IMAGE_NAME:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
+
+artifacts:
+  files:
+    - appspec.yml
+    - Dockerfile
+    - app/**/*
+    - scripts/**/*
+    - $IMAGE_NAME.tar
